@@ -118,12 +118,37 @@ export default function App() {
     };
   }, [selectedId, revealed]);
 
-  // Whether *this* wallet has voted, and whether it is the proposal owner.
+  // Whether the connected wallet is the contract owner. Does not depend on a selected proposal,
+  // so the owner sees the controls even on a freshly deployed (proposal-less) contract.
+  useEffect(() => {
+    if (!account) {
+      setIsOwner(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const contract = readContract();
+        const ownerAddress = await contract.owner();
+        if (cancelled) return;
+        setIsOwner(String(ownerAddress).toLowerCase() === account.toLowerCase());
+      } catch {
+        /* transient RPC hiccup — the poll will retry */
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [account]);
+
+  // Whether *this* wallet has already voted on the selected proposal.
   // Re-runs when the ballot count changes so a vote from another tab is picked up too.
   useEffect(() => {
     if (!account || selectedId === null) {
       setHasVoted(false);
-      setIsOwner(false);
       return;
     }
 
@@ -132,15 +157,10 @@ export default function App() {
     (async () => {
       const contract = readContract();
       try {
-        const [voted, ownerAddress] = await Promise.all([
-          contract.hasVoted(selectedId, account),
-          contract.owner(),
-        ]);
-        if (cancelled) return;
-        setHasVoted(voted);
-        setIsOwner(String(ownerAddress).toLowerCase() === account.toLowerCase());
+        const voted = await contract.hasVoted(selectedId, account);
+        if (!cancelled) setHasVoted(voted);
       } catch {
-        /* transient RPC hiccup - the poll will retry */
+        /* transient RPC hiccup — the poll will retry */
       }
     })();
 
