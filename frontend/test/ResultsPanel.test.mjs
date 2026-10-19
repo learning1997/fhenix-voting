@@ -97,6 +97,39 @@ test("homepage explains the voting steps and what remains public", () => {
   assert.doesNotMatch(html, /npm run deploy:sepolia/);
 });
 
+test("shows a cancel control to the owner only", () => {
+  const props = {
+    proposal: {
+      id: 1n,
+      title: "Test proposal",
+      deadline: 100000n,
+      ballotsCast: 12n,
+      exists: true,
+      resultsUnlocked: false,
+      revealed: false,
+      cancelled: false,
+      votingOpen: true,
+    },
+    secondsLeft: 3600,
+    connected: false,
+    hasVoted: false,
+    pendingChoice: null,
+    submitting: false,
+    encryptStep: null,
+    onVote: () => {},
+    confirmedBallot: null,
+    confirming: false,
+    onConfirmBallot: () => {},
+    onCancel: () => {},
+  };
+
+  const ownerView = renderToStaticMarkup(React.createElement(ProposalCard, { ...props, isOwner: true }));
+  const viewerView = renderToStaticMarkup(React.createElement(ProposalCard, { ...props, isOwner: false }));
+
+  assert.match(ownerView, /Cancel proposal/i);
+  assert.doesNotMatch(viewerView, /Cancel proposal/i);
+});
+
 test("shows the public total ballot count on a proposal", () => {
   const html = renderToStaticMarkup(
     React.createElement(ProposalCard, {

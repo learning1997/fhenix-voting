@@ -33,6 +33,7 @@ contract PrivateVoting is Ownable {
         bool exists;
         bool resultsUnlocked; // allowPublic has been called on the tallies
         bool revealed; // plaintext tallies have been published
+        bool cancelled; // owner has retired the proposal; it stops accepting votes and hides
     }
 
     uint256 public proposalCount;
@@ -53,6 +54,7 @@ contract PrivateVoting is Ownable {
     event VoteCast(uint256 indexed proposalId, address indexed voter, bytes32 encryptedBallot);
     event ResultsUnlocked(uint256 indexed proposalId);
     event ResultRevealed(uint256 indexed proposalId, uint32 yesVotes, uint32 noVotes);
+    event ProposalCancelled(uint256 indexed proposalId);
 
     error UnknownProposal(uint256 proposalId);
     error VotingClosed(uint256 proposalId);
@@ -62,6 +64,8 @@ contract PrivateVoting is Ownable {
     error ResultsAlreadyUnlocked(uint256 proposalId);
     error ResultsNotUnlocked(uint256 proposalId);
     error ResultsAlreadyRevealed(uint256 proposalId);
+    error ProposalNotActive(uint256 proposalId);
+    error ProposalAlreadyCancelled(uint256 proposalId);
 
     constructor(address initialOwner) Ownable(initialOwner) {}
 
@@ -92,6 +96,20 @@ contract PrivateVoting is Ownable {
         emit ProposalCreated(proposalId, title, deadline);
     }
 
+    /**
+     * @notice Retire a proposal: it stops accepting votes and is hidden from the app.
+     * @dev One-way. Ballots already cast stay on-chain; the proposal just leaves the active set.
+     *      Cancelling a proposal with no ballots is how the owner removes a mistaken or test entry.
+     */
+    function cancelProposal(uint256 proposalId) external onlyOwner {
+        Proposal storage p = _proposals[proposalId];
+        if (!p.exists) revert UnknownProposal(proposalId);
+        if (p.cancelled) revert ProposalAlreadyCancelled(proposalId);
+
+        p.cancelled = true;
+        emit ProposalCancelled(proposalId);
+    }
+
     // ---------------------------------------------------------------------
     // Voting
     // ---------------------------------------------------------------------
@@ -105,6 +123,7 @@ contract PrivateVoting is Ownable {
     function vote(uint256 proposalId, externalEuint32 encryptedVote, bytes calldata inputProof) external {
         Proposal storage p = _proposals[proposalId];
         if (!p.exists) revert UnknownProposal(proposalId);
+        if (p.cancelled) revert ProposalNotActive(proposalId);
         if (block.timestamp >= p.deadline) revert VotingClosed(proposalId);
         if (hasVoted[proposalId][msg.sender]) revert AlreadyVoted(proposalId, msg.sender);
         hasVoted[proposalId][msg.sender] = true;
@@ -201,6 +220,7 @@ contract PrivateVoting is Ownable {
         bool exists;
         bool resultsUnlocked;
         bool revealed;
+        bool cancelled;
         bool votingOpen;
     }
 
@@ -214,7 +234,8 @@ contract PrivateVoting is Ownable {
             exists: p.exists,
             resultsUnlocked: p.resultsUnlocked,
             revealed: p.revealed,
-            votingOpen: p.exists && block.timestamp < p.deadline
+            cancelled: p.cancelled,
+            votingOpen: p.exists && !p.cancelled && block.timestamp < p.deadline
         });
     }
 

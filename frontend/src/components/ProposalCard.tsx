@@ -17,6 +17,8 @@ interface Props {
   confirmedBallot: bigint | null;
   confirming: boolean;
   onConfirmBallot: () => void;
+  isOwner?: boolean;
+  onCancel?: () => void;
 }
 
 export function ProposalCard({
@@ -31,6 +33,8 @@ export function ProposalCard({
   confirmedBallot,
   confirming,
   onConfirmBallot,
+  isOwner = false,
+  onCancel,
 }: Props) {
   const isOpen = proposal.votingOpen;
   const canVote = connected && isOpen && !hasVoted && !submitting;
@@ -178,6 +182,14 @@ export function ProposalCard({
           </ul>
         </>
       )}
+
+      {isOwner && onCancel ? (
+        <div className="owner-row">
+          <button type="button" className="btn btn-sm btn-danger" onClick={onCancel}>
+            Cancel proposal
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }

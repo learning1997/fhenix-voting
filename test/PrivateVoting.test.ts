@@ -55,6 +55,7 @@ describe("PrivateVoting", () => {
       expect(p.deadline).to.equal(BigInt(deadline));
       expect(p.exists).to.equal(true);
       expect(p.votingOpen).to.equal(true);
+      expect(p.cancelled).to.equal(false);
       expect(p.ballotsCast).to.equal(0n);
       expect(await voting.proposalCount()).to.equal(1n);
     });
@@ -322,6 +323,41 @@ describe("PrivateVoting", () => {
           .revealResults(1, yes.decryptedValue, yes.signature, no.decryptedValue, no.signature),
       )
         .to.be.revertedWithCustomError(voting, "ResultsAlreadyRevealed")
+        .withArgs(1n);
+    });
+  });
+
+  describe("cancel", () => {
+    it("lets the owner cancel a proposal so it stops showing", async () => {
+      expect((await voting.getProposal(1)).cancelled).to.equal(false);
+
+      await expect(voting.connect(owner).cancelProposal(1))
+        .to.emit(voting, "ProposalCancelled")
+        .withArgs(1n);
+
+      expect((await voting.getProposal(1)).cancelled).to.equal(true);
+    });
+
+    it("refuses cancel from a non-owner", async () => {
+      await expect(voting.connect(alice).cancelProposal(1)).to.be.revertedWithCustomError(
+        voting,
+        "OwnableUnauthorizedAccount",
+      );
+    });
+
+    it("rejects votes on a cancelled proposal", async () => {
+      await voting.connect(owner).cancelProposal(1);
+      const { handle, proof } = await encryptBallot(aliceClient, 1n);
+
+      await expect(voting.connect(alice).vote(1, handle, proof))
+        .to.be.revertedWithCustomError(voting, "ProposalNotActive")
+        .withArgs(1n);
+    });
+
+    it("rejects cancelling the same proposal twice", async () => {
+      await voting.connect(owner).cancelProposal(1);
+      await expect(voting.connect(owner).cancelProposal(1))
+        .to.be.revertedWithCustomError(voting, "ProposalAlreadyCancelled")
         .withArgs(1n);
     });
   });

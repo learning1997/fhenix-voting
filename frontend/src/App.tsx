@@ -541,6 +541,24 @@ export default function App() {
               confirmedBallot={confirmedBallot}
               confirming={confirming}
               onConfirmBallot={handleConfirmBallot}
+              isOwner={Boolean(isOwner && account)}
+              onCancel={async () => {
+                if (!signer || !selected) return;
+                const confirmed = window.confirm(
+                  `Cancel proposal #${selected.id.toString()} "${selected.title}"? It stops accepting votes and disappears from the list. This is permanent.`,
+                );
+                if (!confirmed) return;
+                setError(null);
+                setNotice(null);
+                try {
+                  const tx = await writeContract(signer).cancelProposal(selected.id);
+                  await tx.wait();
+                  setNotice("Proposal cancelled.");
+                  await refresh();
+                } catch (e) {
+                  setError(readableError(e));
+                }
+              }}
             />
             <ProposalList proposals={proposals} selectedId={selectedId} onSelect={setSelectedId} />
           </div>

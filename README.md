@@ -281,6 +281,7 @@ npm run export-abi              # from the repo root
 | Function | Access | Description |
 | --- | --- | --- |
 | `createProposal(string title, uint64 deadline)` | owner | Opens a proposal. `deadline` is a unix timestamp in the future. |
+| `cancelProposal(uint256 id)` | owner | Retires a proposal: it stops accepting votes and is hidden from the app. One-way. |
 | `vote(uint256 id, externalEuint32 encryptedVote, bytes proof)` | anyone | Casts an encrypted `1`/`0`. Reverts if closed, unknown, or already voted. |
 | `unlockResults(uint256 id)` | owner, after deadline | `FHE.allowPublic` on both tallies. Phase 1 of the reveal. |
 | `revealResults(uint256 id, uint32 yes, bytes yesSig, uint32 no, bytes noSig)` | owner | Verifies and publishes the decrypted sums. Phase 2. |

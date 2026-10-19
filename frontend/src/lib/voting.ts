@@ -29,6 +29,7 @@ export interface ProposalView {
   exists: boolean;
   resultsUnlocked: boolean;
   revealed: boolean;
+  cancelled: boolean;
   votingOpen: boolean;
 }
 
@@ -62,12 +63,14 @@ export async function fetchProposals(count: bigint, provider?: Provider): Promis
         exists: p.exists as boolean,
         resultsUnlocked: p.resultsUnlocked as boolean,
         revealed: p.revealed as boolean,
+        cancelled: p.cancelled as boolean,
         votingOpen: p.votingOpen as boolean,
       } satisfies ProposalView;
     }),
   );
 
-  return proposals.filter((p) => p.exists);
+  // Cancelled proposals stay on-chain for the record but are hidden from the active list.
+  return proposals.filter((p) => p.exists && !p.cancelled);
 }
 
 /**
