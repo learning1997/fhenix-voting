@@ -1,0 +1,25 @@
+{
+  "name": "private-voting-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && node scripts/assert-bundle-budget.mjs",
+    "test": "node --test",
+    "preview": "vite preview --port 5173"
+  },
+  "dependencies": {
+    "@cofhe/sdk": "^1.0.0",
+    "ethers": "^6.13.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

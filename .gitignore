@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.env
+.env.local
+
+# Hardhat
+artifacts/
+cache/
+types/
+coverage/
+coverage.json
+deployments/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Misc
+.DS_Store
+*.log

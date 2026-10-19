@@ -1,0 +1,551 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "initialOwner",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      }
+    ],
+    "name": "AlreadyVoted",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "deadline",
+        "type": "uint64"
+      }
+    ],
+    "name": "DeadlineNotInFuture",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ResultsAlreadyRevealed",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ResultsAlreadyUnlocked",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ResultsNotUnlocked",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "int32",
+        "name": "value",
+        "type": "int32"
+      }
+    ],
+    "name": "SecurityZoneOutOfBounds",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "UnknownProposal",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "VotingClosed",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "VotingStillOpen",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "deadline",
+        "type": "uint64"
+      }
+    ],
+    "name": "ProposalCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "yesVotes",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "noVotes",
+        "type": "uint32"
+      }
+    ],
+    "name": "ResultRevealed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ResultsUnlocked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "encryptedBallot",
+        "type": "bytes32"
+      }
+    ],
+    "name": "VoteCast",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "deadline",
+        "type": "uint64"
+      }
+    ],
+    "name": "createProposal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getEncryptedTally",
+    "outputs": [
+      {
+        "internalType": "euint32",
+        "name": "yesVotes",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "euint32",
+        "name": "noVotes",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getMyBallot",
+    "outputs": [
+      {
+        "internalType": "euint32",
+        "name": "ballot",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getProposal",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "internalType": "uint64",
+            "name": "deadline",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint32",
+            "name": "ballotsCast",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bool",
+            "name": "exists",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "resultsUnlocked",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "revealed",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "votingOpen",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct PrivateVoting.ProposalView",
+        "name": "view_",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "hasVoted",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proposalCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint32",
+        "name": "yesPlaintext",
+        "type": "uint32"
+      },
+      {
+        "internalType": "bytes",
+        "name": "yesSignature",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint32",
+        "name": "noPlaintext",
+        "type": "uint32"
+      },
+      {
+        "internalType": "bytes",
+        "name": "noSignature",
+        "type": "bytes"
+      }
+    ],
+    "name": "revealResults",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "revealedNo",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "revealedYes",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "unlockResults",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "externalEuint32",
+        "name": "encryptedVote",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes",
+        "name": "inputProof",
+        "type": "bytes"
+      }
+    ],
+    "name": "vote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

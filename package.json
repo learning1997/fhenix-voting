@@ -1,0 +1,35 @@
+{
+  "name": "private-voting-dao",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Private on-chain voting with Fhenix CoFHE (FHE) on Ethereum Sepolia",
+  "license": "MIT",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network eth-sepolia",
+    "deploy:arb-sepolia": "hardhat run scripts/deploy.ts --network arb-sepolia",
+    "wallet": "hardhat run scripts/wallet.ts",
+    "export-abi": "node scripts/export-abi.mjs"
+  },
+  "devDependencies": {
+    "@cofhe/hardhat-plugin": "^1.0.0",
+    "@cofhe/mock-contracts": "^1.0.0",
+    "@cofhe/sdk": "^1.0.0",
+    "@fhenixprotocol/cofhe-contracts": "^1.0.1",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@openzeppelin/contracts": "^5.0.2",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "chai": "^4.3.0",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.0",
+    "hardhat": "^2.22.19",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
