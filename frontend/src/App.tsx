@@ -5,6 +5,7 @@ import { ProposalCard } from "./components/ProposalCard";
 import { ProposalList } from "./components/ProposalList";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { PrivacyExplainer } from "./components/PrivacyExplainer";
+import { OwnerPanel } from "./components/OwnerPanel";
 import { SEPOLIA_CHAIN_ID, connectCofhe, disconnectCofhe, ensureSepolia, revokeWalletPermission } from "./lib/cofhe";
 import { readableError } from "./lib/format";
 import {
@@ -509,6 +510,13 @@ export default function App() {
           <div>{notice}</div>
         </div>
       )}
+
+      <OwnerPanel
+        signer={signer}
+        isOwner={Boolean(isOwner && account && isSepolia)}
+        isSepolia={isSepolia}
+        onCreated={refresh}
+      />
 
       {!selected ? (
         <section className="panel" style={{ marginTop: "clamp(34px, 5vw, 56px)" }}>
